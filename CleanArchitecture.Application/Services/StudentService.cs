@@ -1,10 +1,13 @@
 using CleanArchitecture.Application.DTOs;
+using CleanArchitecture.Application.Events;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Application.Services;
 
-public class StudentService(IStudentRepository repository) : IStudentService
+public class StudentService(
+    IStudentRepository repository,
+    IMessagePublisher publisher) : IStudentService
 {
     public async Task<IEnumerable<StudentDto>> GetAllAsync()
     {
@@ -44,6 +47,13 @@ public class StudentService(IStudentRepository repository) : IStudentService
         repository.Create(student);
         await repository.SaveChangesAsync();
 
+        await publisher.PublishAsync("student.registered", new StudentRegisteredEvent
+        {
+            StudentId = student.StudentId,
+            StudentName = student.Name,
+            StudentEmail = student.Email
+        });
+
         return new StudentDto
         {
             StudentId = student.StudentId,
@@ -65,6 +75,13 @@ public class StudentService(IStudentRepository repository) : IStudentService
         repository.Update(student);
         await repository.SaveChangesAsync();
 
+        await publisher.PublishAsync("audit.log", new AuditEvent
+        {
+            Entity = "Student",
+            Action = "Updated",
+            EntityId = id
+        });
+
         return new StudentDto
         {
             StudentId = student.StudentId,
@@ -81,6 +98,14 @@ public class StudentService(IStudentRepository repository) : IStudentService
 
         repository.Delete(student);
         await repository.SaveChangesAsync();
+
+        await publisher.PublishAsync("audit.log", new AuditEvent
+        {
+            Entity = "Student",
+            Action = "Deleted",
+            EntityId = id
+        });
+
         return true;
     }
 }

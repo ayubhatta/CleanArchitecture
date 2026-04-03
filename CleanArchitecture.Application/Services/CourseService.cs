@@ -1,10 +1,14 @@
 using CleanArchitecture.Application.DTOs;
+using CleanArchitecture.Application.Events;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Application.Services;
 
-public class CourseService(ICourseRepository repository) : ICourseService
+public class CourseService(
+    ICourseRepository repository,
+    IEnrollmentRepository enrollmentRepository,
+    IMessagePublisher publisher) : ICourseService
 {
     public async Task<IEnumerable<CourseDto>> GetAllAsync()
     {
@@ -44,6 +48,13 @@ public class CourseService(ICourseRepository repository) : ICourseService
         repository.Create(course);
         await repository.SaveChangesAsync();
 
+        await publisher.PublishAsync("audit.log", new AuditEvent
+        {
+            Entity = "Course",
+            Action = "Created",
+            EntityId = course.CourseId
+        });
+
         return new CourseDto
         {
             CourseId = course.CourseId,
@@ -65,6 +76,20 @@ public class CourseService(ICourseRepository repository) : ICourseService
         repository.Update(course);
         await repository.SaveChangesAsync();
 
+        var enrollments = await enrollmentRepository.GetByCourseIdAsync(id);
+        var students = enrollments.Select(e => new EnrolledStudentInfo
+        {
+            StudentName = e.Student.Name,
+            StudentEmail = e.Student.Email
+        }).ToList();
+
+        await publisher.PublishAsync("course.updated", new CourseUpdatedEvent
+        {
+            CourseId = course.CourseId,
+            CourseName = course.CourseName,
+            EnrolledStudents = students
+        });
+
         return new CourseDto
         {
             CourseId = course.CourseId,
@@ -81,6 +106,14 @@ public class CourseService(ICourseRepository repository) : ICourseService
 
         repository.Delete(course);
         await repository.SaveChangesAsync();
+
+        await publisher.PublishAsync("audit.log", new AuditEvent
+        {
+            Entity = "Course",
+            Action = "Deleted",
+            EntityId = id
+        });
+
         return true;
     }
 }

@@ -1,10 +1,11 @@
 using CleanArchitecture.Application.DTOs;
+using CleanArchitecture.Application.Events;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Application.Services;
 
-public class EnrollmentService(IEnrollmentRepository repository) : IEnrollmentService
+public class EnrollmentService(IEnrollmentRepository repository, IMessagePublisher publisher) : IEnrollmentService
 {
     public async Task<IEnumerable<EnrollmentDto>> GetAllAsync()
     {
@@ -38,7 +39,19 @@ public class EnrollmentService(IEnrollmentRepository repository) : IEnrollmentSe
         await repository.SaveChangesAsync();
 
         var created = await repository.GetByIdAsync(dto.StudentId, dto.CourseId);
-        return MapToDto(created!);
+        var result = MapToDto(created!);
+
+        await publisher.PublishAsync("enrollment.created", new EnrollmentCreatedEvent
+        {
+            StudentId = result.StudentId,
+            StudentName = result.StudentName,
+            StudentEmail = created!.Student.Email,
+            CourseId = result.CourseId,
+            CourseName = result.CourseName,
+            EnrollmentDate = result.EnrollmentDate
+        });
+
+        return result;
     }
 
     public async Task<bool> DeleteAsync(int studentId, int courseId)
@@ -48,6 +61,16 @@ public class EnrollmentService(IEnrollmentRepository repository) : IEnrollmentSe
 
         repository.Delete(enrollment);
         await repository.SaveChangesAsync();
+
+        await publisher.PublishAsync("enrollment.cancelled", new EnrollmentCancelledEvent
+        {
+            StudentId = enrollment.StudentId,
+            StudentName = enrollment.Student.Name,
+            StudentEmail = enrollment.Student.Email,
+            CourseId = enrollment.CourseId,
+            CourseName = enrollment.Course.CourseName
+        });
+
         return true;
     }
 

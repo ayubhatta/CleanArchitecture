@@ -8,6 +8,13 @@ namespace CleanArchitecture.Infrastructure.Repositories;
 public class EnrollmentRepository(AppDbContext context)
     : RepositoryBase<StudentCourse>(context), IEnrollmentRepository
 {
+    public new async Task<List<StudentCourse>> FindAllAsync(bool trackChanges = false) =>
+        await Context.Set<StudentCourse>()
+            .Include(sc => sc.Student)
+            .Include(sc => sc.Course)
+            .AsNoTracking()
+            .ToListAsync();
+
     public async Task<StudentCourse?> GetByIdAsync(int studentId, int courseId) =>
         await FindByCondition(sc => sc.StudentId == studentId && sc.CourseId == courseId)
             .Include(sc => sc.Student)
