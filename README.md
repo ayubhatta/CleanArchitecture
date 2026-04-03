@@ -12,7 +12,7 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 | Layer | Technology |
 |---|---|
-| Framework | ASP.NET Core 8 |
+| Framework | ASP.NET Core 10 |
 | Database | PostgreSQL + Entity Framework Core |
 | Caching | Redis (StackExchange.Redis) |
 | Messaging | RabbitMQ (RabbitMQ.Client) |
@@ -47,7 +47,7 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Redis](https://redis.io/)
 - [RabbitMQ](https://www.rabbitmq.com/)
