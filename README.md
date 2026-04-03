@@ -6,6 +6,15 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ## 🏗️ Architecture
 
+CleanArchitecture/                  → API Layer (Controllers, Program.cs)
+CleanArchitecture.Application/      → Business Logic (Services, Interfaces, DTOs, Events)
+CleanArchitecture.Domain/           → Core Entities & Enums
+CleanArchitecture.Infrastructure/   → Data, Caching, Messaging, Repositories
+CleanArchitecture.UnitTests/        → Unit Tests (Services)
+CleanArchitecture.IntegrationTests/ → Integration Tests (Controllers)
+
+---
+
 ---
 
 ## ⚙️ Tech Stack
@@ -19,6 +28,7 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 | Email | SMTP (System.Net.Mail) |
 | ORM | Entity Framework Core |
 | DI Decoration | Scrutor |
+| Testing | xUnit + Moq + FluentAssertions |
 
 ---
 
@@ -28,6 +38,8 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 - **Redis Caching** with cache invalidation on mutations (decorator pattern)
 - **RabbitMQ Messaging** for async event-driven communication
 - **Email Notifications** triggered via RabbitMQ consumers
+- **Unit Tests** for all services with mocked dependencies
+- **Integration Tests** for all controllers using in-memory database
 
 ---
 
@@ -43,6 +55,20 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ---
 
+## 🧪 Tests
+
+| Project | Type | Count |
+|---|---|---|
+| `CleanArchitecture.UnitTests` | Unit Tests | 27 |
+| `CleanArchitecture.IntegrationTests` | Integration Tests | 13 |
+
+Run all tests:
+```bash
+dotnet test
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -54,8 +80,8 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ### 1 — Clone the repository
 ```bash
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/ayubhatta/CleanArchitecture.git
+cd CleanArchitecture
 ```
 
 ### 2 — Configure secrets
