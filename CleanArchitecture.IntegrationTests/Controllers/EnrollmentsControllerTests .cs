@@ -6,16 +6,10 @@ using FluentAssertions;
 
 namespace CleanArchitecture.IntegrationTests.Controllers;
 
-public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFactory>
+public class EnrollmentsControllerTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient _client = factory.CreateClient();
 
-    public EnrollmentsControllerTests(CustomWebApplicationFactory factory)
-    {
-        _client = factory.CreateClient();
-    }
-
-    // Helper — creates a student and returns it
     private async Task<StudentDto> CreateStudentAsync(string name = "John", string email = "john@test.com")
     {
         var dto = new CreateStudentDto { Name = name, Email = email, Status = StudentStatus.Active };
@@ -23,7 +17,6 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
         return (await response.Content.ReadFromJsonAsync<StudentDto>())!;
     }
 
-    // Helper — creates a course and returns it
     private async Task<CourseDto> CreateCourseAsync(string name = "C# Basics")
     {
         var dto = new CreateCourseDto { CourseName = name, Credits = 3, Level = CourseLevel.Beginner };
@@ -41,7 +34,6 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
     [Fact]
     public async Task Create_ShouldReturn201_WithCreatedEnrollment()
     {
-        // Arrange
         var student = await CreateStudentAsync("Alice", "alice@test.com");
         var course = await CreateCourseAsync("Clean Architecture");
 
@@ -53,11 +45,9 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
             Status = EnrollmentStatus.Enrolled
         };
 
-        // Act
         var response = await _client.PostAsJsonAsync("/api/enrollments", dto);
         var created = await response.Content.ReadFromJsonAsync<EnrollmentDto>();
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         created.Should().NotBeNull();
         created!.StudentId.Should().Be(student.StudentId);
@@ -69,7 +59,6 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
     [Fact]
     public async Task GetByStudent_ShouldReturn200_WithEnrollments()
     {
-        // Arrange
         var student = await CreateStudentAsync("Bob", "bob@test.com");
         var course = await CreateCourseAsync("RabbitMQ Basics");
 
@@ -82,11 +71,9 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
         };
         await _client.PostAsJsonAsync("/api/enrollments", dto);
 
-        // Act
         var response = await _client.GetAsync($"/api/enrollments/student/{student.StudentId}");
         var enrollments = await response.Content.ReadFromJsonAsync<IEnumerable<EnrollmentDto>>();
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         enrollments.Should().NotBeEmpty();
         enrollments!.Should().OnlyContain(e => e.StudentId == student.StudentId);
@@ -95,7 +82,6 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
     [Fact]
     public async Task GetByCourse_ShouldReturn200_WithEnrollments()
     {
-        // Arrange
         var student = await CreateStudentAsync("Carol", "carol@test.com");
         var course = await CreateCourseAsync("Redis Caching");
 
@@ -108,11 +94,9 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
         };
         await _client.PostAsJsonAsync("/api/enrollments", dto);
 
-        // Act
         var response = await _client.GetAsync($"/api/enrollments/course/{course.CourseId}");
         var enrollments = await response.Content.ReadFromJsonAsync<IEnumerable<EnrollmentDto>>();
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         enrollments.Should().NotBeEmpty();
         enrollments!.Should().OnlyContain(e => e.CourseId == course.CourseId);
@@ -121,7 +105,6 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
     [Fact]
     public async Task Delete_ShouldReturn204_WhenEnrollmentExists()
     {
-        // Arrange
         var student = await CreateStudentAsync("Dave", "dave@test.com");
         var course = await CreateCourseAsync("Docker Basics");
 
@@ -134,10 +117,8 @@ public class EnrollmentsControllerTests : IClassFixture<CustomWebApplicationFact
         };
         await _client.PostAsJsonAsync("/api/enrollments", dto);
 
-        // Act
         var response = await _client.DeleteAsync($"/api/enrollments/{student.StudentId}/{course.CourseId}");
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 

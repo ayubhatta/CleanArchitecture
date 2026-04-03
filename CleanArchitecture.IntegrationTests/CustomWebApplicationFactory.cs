@@ -16,7 +16,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            // Remove ALL EF-related registrations
             var descriptorsToRemove = services
                 .Where(d =>
                     d.ServiceType == typeof(DbContextOptions<AppDbContext>) ||
@@ -29,16 +28,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             foreach (var descriptor in descriptorsToRemove)
                 services.Remove(descriptor);
 
-            // Add InMemory DB
             services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase("TestDb_"));
 
-            // Replace Redis with NoOp
             services.RemoveAll<ICacheService>();
             services.RemoveAll(typeof(StackExchange.Redis.IConnectionMultiplexer));
             services.AddScoped<ICacheService, NoCacheService>();
 
-            // Replace RabbitMQ with mock
             services.RemoveAll<IMessagePublisher>();
             services.RemoveAll<RabbitMQ.Client.IConnection>();
             var mockPublisher = new Mock<IMessagePublisher>();
@@ -46,12 +42,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                          .Returns(Task.CompletedTask);
             services.AddScoped<IMessagePublisher>(_ => mockPublisher.Object);
 
-            // Replace EmailService with mock
             services.RemoveAll<IEmailService>();
             var mockEmail = new Mock<IEmailService>();
             services.AddScoped<IEmailService>(_ => mockEmail.Object);
 
-            // Remove all hosted services (RabbitMQ consumers)
             var hostedServices = services
                 .Where(d => d.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService))
                 .ToList();

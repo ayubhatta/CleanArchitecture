@@ -6,14 +6,9 @@ using FluentAssertions;
 
 namespace CleanArchitecture.IntegrationTests.Controllers;
 
-public class StudentsControllerTests : IClassFixture<CustomWebApplicationFactory>
+public class StudentsControllerTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly HttpClient _client;
-
-    public StudentsControllerTests(CustomWebApplicationFactory factory)
-    {
-        _client = factory.CreateClient();
-    }
+    private readonly HttpClient _client = factory.CreateClient();
 
     [Fact]
     public async Task GetAll_ShouldReturn200()
@@ -46,12 +41,10 @@ public class StudentsControllerTests : IClassFixture<CustomWebApplicationFactory
     [Fact]
     public async Task GetById_ShouldReturn200_AfterCreation()
     {
-        // Arrange — create first
         var dto = new CreateStudentDto { Name = "Jane", Email = "jane@test.com", Status = StudentStatus.Active };
         var createResponse = await _client.PostAsJsonAsync("/api/students", dto);
         var created = await createResponse.Content.ReadFromJsonAsync<StudentDto>();
 
-        // Act — fetch by id from same client (same DB)
         var response = await _client.GetAsync($"/api/students/{created!.StudentId}");
         var student = await response.Content.ReadFromJsonAsync<StudentDto>();
 
@@ -62,12 +55,10 @@ public class StudentsControllerTests : IClassFixture<CustomWebApplicationFactory
     [Fact]
     public async Task Delete_ShouldReturn204_WhenStudentExists()
     {
-        // Arrange — create first
         var dto = new CreateStudentDto { Name = "ToDelete", Email = "delete@test.com", Status = StudentStatus.Active };
         var createResponse = await _client.PostAsJsonAsync("/api/students", dto);
         var created = await createResponse.Content.ReadFromJsonAsync<StudentDto>();
 
-        // Act
         var response = await _client.DeleteAsync($"/api/students/{created!.StudentId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
