@@ -2,5 +2,7 @@
   <Project Path="CleanArchitecture.Application/CleanArchitecture.Application.csproj" />
   <Project Path="CleanArchitecture.Domain/CleanArchitecture.Domain.csproj" />
   <Project Path="CleanArchitecture.Infrastructure/CleanArchitecture.Infrastructure.csproj" />
+  <Project Path="CleanArchitecture.IntegrationTests/CleanArchitecture.IntegrationTests.csproj" />
+  <Project Path="CleanArchitecture.UnitTests/CleanArchitecture.UnitTests.csproj" />
   <Project Path="CleanArchitecture/CleanArchitecture.csproj" />
 </Solution>
