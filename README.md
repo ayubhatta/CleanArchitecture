@@ -15,8 +15,6 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ---
 
----
-
 ## ⚙️ Tech Stack
 
 | Layer | Technology |
