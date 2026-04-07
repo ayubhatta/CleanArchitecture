@@ -6,12 +6,12 @@ A RESTful API built with ASP.NET Core following **Clean Architecture** principle
 
 ## 🏗️ Architecture
 
-CleanArchitecture/                  → API Layer (Controllers, Program.cs)
-CleanArchitecture.Application/      → Business Logic (Services, Interfaces, DTOs, Events)
-CleanArchitecture.Domain/           → Core Entities & Enums
-CleanArchitecture.Infrastructure/   → Data, Caching, Messaging, Repositories
-CleanArchitecture.UnitTests/        → Unit Tests (Services)
-CleanArchitecture.IntegrationTests/ → Integration Tests (Controllers)
+**CleanArchitecture/**                  → API Layer (Controllers, Program.cs)
+**CleanArchitecture.Application/**      → Business Logic (Services, Interfaces, DTOs, Events)
+**CleanArchitecture.Domain/**           → Core Entities & Enums
+**CleanArchitecture.Infrastructure/**   → Data, Caching, Messaging, Repositories
+**CleanArchitecture.UnitTests/**        → Unit Tests (Services)
+**CleanArchitecture.IntegrationTests/** → Integration Tests (Controllers)
 
 ---
 
