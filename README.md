@@ -1,6 +1,6 @@
 # Clean Architecture — Student Enrollment System
 
-A RESTful API built with ASP.NET Core following **Clean Architecture** principles, featuring Redis caching, RabbitMQ messaging, and email notifications.
+A RESTful API built with ASP.NET Core following **Clean Architecture** principles, featuring Redis caching, RabbitMQ messaging, email notifications, and fully containerized using Docker for consistent deployment and scalability across environments.
 
 ---
 
